@@ -1,28 +1,20 @@
 package services;
 
 
+import com.google.gson.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
 
 
 public class ParameterGetter {
-    public static Map handleRequest(HttpServletRequest req) throws IOException {
+    public static JsonObject handleRequest(HttpServletRequest request) throws IOException {
 
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        Map returnedMap = new HashMap();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            String[] paramValues = req.getParameterValues(paramName);
-
-            for (String paramValue : paramValues) {
-                returnedMap.put(paramName,paramValue);
-            }
-
-        }
-
-        return returnedMap;
+        JsonParser parser = new JsonParser();
+//        JsonElement jelement = new JsonParser().parse(jsonLine);
+//        return (JsonObject) parser.parse(request.getReader());
+        JsonElement jsonElement = parser.parse(request.getReader());
+        return jsonElement.getAsJsonObject();
     }
 
 }

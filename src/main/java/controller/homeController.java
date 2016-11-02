@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Map;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import services.GsonFactory;
 import services.ParameterGetter;
 import services.userAuthenticationService;
@@ -25,10 +26,10 @@ public class homeController extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Map requestParameter = ParameterGetter.handleRequest(request);
-        Object password = requestParameter.get("password");
-        Object email = requestParameter.get("email");
+        JsonObject requestData = ParameterGetter.handleRequest(request);
         Boolean loginStatus = false;
+        String email = GsonFactory.getJsonValue(requestData, "email");
+        String password = GsonFactory.getJsonValue(requestData, "password");
         if (email != null && password != null) {
             String Password = password.toString();
             String Email = email.toString();

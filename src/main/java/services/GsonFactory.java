@@ -2,6 +2,9 @@ package services;
 
 import beans.GsonResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,5 +18,9 @@ public class GsonFactory {
 
         GsonResponse response =  new GsonResponse(status, error, objectMap);
         return GsonParser.toJson(response);
+    }
+
+    public static String getJsonValue(JsonObject jsonObj, String property) {
+        return jsonObj.get(property).getAsString();
     }
 }
