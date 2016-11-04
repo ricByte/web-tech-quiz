@@ -14,7 +14,12 @@ public class ParameterGetter {
 //        JsonElement jelement = new JsonParser().parse(jsonLine);
 //        return (JsonObject) parser.parse(request.getReader());
         JsonElement jsonElement = parser.parse(request.getReader());
-        return jsonElement.getAsJsonObject();
+
+        if (!jsonElement.isJsonNull()) {
+            return jsonElement.getAsJsonObject();
+        }
+
+        return new JsonObject();
     }
 
 }
