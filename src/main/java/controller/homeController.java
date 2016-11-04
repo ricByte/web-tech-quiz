@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Map;
 
 import com.google.gson.JsonObject;
@@ -36,7 +37,11 @@ public class homeController extends HttpServlet {
         if (email != null && password != null) {
             String Password = password.toString();
             String Email = email.toString();
-            loginStatus = userAuthenticationService.authLogin(Email,Password);
+            try {
+                loginStatus = userAuthenticationService.authLogin(Email,Password);
+            } catch (SQLException e) {
+                response.getWriter().println("Can't login");
+            }
         }
 
         HttpServletResponse responseHeader = ResponseFactory.createResponse(response);
@@ -45,6 +50,7 @@ public class homeController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request, response);
+        HttpServletResponse responseHeader = ResponseFactory.createResponse(response);
+        ResponseFactory.sendResponse(responseHeader, false, "loginStatus", 403);
     }
 }

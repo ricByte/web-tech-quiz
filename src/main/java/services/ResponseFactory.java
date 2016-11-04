@@ -19,8 +19,18 @@ public class ResponseFactory {
     }
 
     public static void sendResponse(HttpServletResponse response, Object value, String name) throws IOException {
+
         PrintWriter out = response.getWriter();
         out.write(GsonFactory.constructJson("OK", 200, value, name));
         out.flush();
+
+    }
+
+    public static void sendResponse(HttpServletResponse response, Object value, String name, int status) throws IOException {
+
+        PrintWriter out = response.getWriter();
+        out.write(GsonFactory.constructJson("OK", status, value, name));
+        out.flush();
+
     }
 }
