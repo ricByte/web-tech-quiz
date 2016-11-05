@@ -1,5 +1,7 @@
 package controller;
 
+import beans.RegisterObject;
+
 import com.google.gson.JsonObject;
 import services.GsonFactory;
 import services.ParameterGetter;
@@ -26,30 +28,34 @@ public class RegisterController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         JsonObject requestData = ParameterGetter.handleRequest(request);
-        Boolean registerStatus = false;
+        RegisterObject registerObject = new RegisterObject();
+
         String email = GsonFactory.getJsonValue(requestData, "email");
         String password = GsonFactory.getJsonValue(requestData, "password");
         String nickname = GsonFactory.getJsonValue(requestData, "nickname");
         int cleverness = requestData.get("cleverness").getAsInt();
-//        int cleverness = (int) GsonFactory.getJsonValue(requestData, "cleverness");
         int typeOfPlayer = requestData.get("typeOfPlayer").getAsInt();
-//        int typeOfPlayer = (int) GsonFactory.getJsonValue(requestData, "typeOfPlayer");
 
         if (email != null && password != null) {
             String Password = password.toString();
             String Email = email.toString();
             if (userAuthenticationService.verifyEmail(Email)) {
                 try {
-                    userAuthenticationService.registerUser(Email, Password, nickname, cleverness, typeOfPlayer);
-                    registerStatus = true;
+
+                    registerObject.setUser(userAuthenticationService.registerUser(Email, Password, nickname, cleverness, typeOfPlayer));
+                    registerObject.setRegisterStatus(true);
+
                 } catch (SQLException e) {
+
                     response.getWriter().println("Can't register");
+                    registerObject.setRegisterStatus(false);
+
                 }
             }
         }
 
         HttpServletResponse responseHeader = ResponseFactory.createResponse(response);
-        ResponseFactory.sendResponse(responseHeader, registerStatus, "loginStatus");
+        ResponseFactory.sendResponse(responseHeader, registerObject, "registerObject");
 
     }
 

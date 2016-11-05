@@ -49,14 +49,16 @@ public class userAuthenticationService {
         return false;
     }
 
-    public static void registerUser(String email, String password, String nickname, int cleverness, int typeOfPlayer) throws ServletException, SQLException {
+    public static User registerUser(String email, String password, String nickname, int cleverness, int typeOfPlayer) throws ServletException, SQLException {
         String md5Password = getMd5(password);
 
         DataBaseConnector dbConn = new DataBaseConnector();
         UserManager userManager = new UserManager(dbConn.connectToDb());
 
-        User user = new User(email, md5Password, nickname, cleverness, typeOfPlayer);
+        User user = new User(email, nickname, md5Password, cleverness, typeOfPlayer);
         userManager.register(user);
+
+        return  user;
     }
 
     public static Boolean verifyEmail(String email) {
