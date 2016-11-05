@@ -61,7 +61,7 @@ public class UserManager {
         stmt.setString(1, user.getEmail());
         stmt.setString(2, user.getPassword());
         stmt.setString(3, user.getNickname());
-        stmt.setInt(4, user.getCleverness());
+        stmt.setInt(4, 1);
         stmt.setInt(5, user.getTypeOfPlayer());
 
         stmt.executeUpdate();
