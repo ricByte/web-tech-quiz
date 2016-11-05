@@ -14,6 +14,32 @@ public class UserManager {
         this.conn = conn;
     }
 
+    public createUserTable() {
+        String query = "CREATE TABLE `user` (\n" +
+                "  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,\n" +
+                "  `email` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,\n" +
+                "  `password` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,\n" +
+                "  `nickname` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,\n" +
+                "  `cleverness` int(1) DEFAULT '0',\n" +
+                "  `typeOfPlayer` int(1) DEFAULT '0',\n" +
+                "  PRIMARY KEY (`id`)\n" +
+                ") ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+
+        ResultSet rs = stmt.executeQuery();
+
+        int count = 0;
+
+        if (rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        rs.close();
+
+        return count;
+    }
+
     public int login(User user) throws SQLException {
 
         String sql = "select count(*) as count from user where nickname=? and password=?";
