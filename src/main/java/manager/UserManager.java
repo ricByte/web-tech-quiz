@@ -51,4 +51,26 @@ public class UserManager {
 
         stmt.close();
     }
+
+    public Boolean checkIfAlreadyRegister(User user) throws SQLException {
+        String sql = "select count(*) as count from user where email=?";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setString(1, user.getEmail());
+
+        ResultSet rs = stmt.executeQuery();
+
+        int count = 0;
+        Boolean alreadyRegister = false;
+
+        if (rs.next()) {
+            count = rs.getInt("count");
+            if(count > 0) alreadyRegister = true;
+        }
+
+        rs.close();
+
+        return alreadyRegister;
+    }
 }

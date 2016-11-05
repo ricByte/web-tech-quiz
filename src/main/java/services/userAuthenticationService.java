@@ -56,9 +56,12 @@ public class userAuthenticationService {
         UserManager userManager = new UserManager(dbConn.connectToDb());
 
         User user = new User(email, nickname, md5Password, cleverness, typeOfPlayer);
-        userManager.register(user);
+        if(!userManager.checkIfAlreadyRegister(user)) {
+            userManager.register(user);
+            return user;
+        }
 
-        return  user;
+        return  null;
     }
 
     public static Boolean verifyEmail(String email) {

@@ -2,6 +2,7 @@ package controller;
 
 import beans.RegisterObject;
 
+import beans.User;
 import com.google.gson.JsonObject;
 import services.GsonFactory;
 import services.ParameterGetter;
@@ -42,8 +43,15 @@ public class RegisterController extends HttpServlet {
             if (userAuthenticationService.verifyEmail(Email)) {
                 try {
 
-                    registerObject.setUser(userAuthenticationService.registerUser(Email, Password, nickname, cleverness, typeOfPlayer));
-                    registerObject.setRegisterStatus(true);
+                    User registeredUser = userAuthenticationService.registerUser(Email, Password, nickname, cleverness, typeOfPlayer);
+
+                    registerObject.setUser(registeredUser);
+
+                    if (registeredUser != null) {
+                        registerObject.setRegisterStatus(true);
+                    }else {
+                        registerObject.setRegisterStatus(false);
+                    }
 
                 } catch (SQLException e) {
 
