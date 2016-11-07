@@ -47,7 +47,7 @@ public class homeController extends HttpServlet {
                     lo = new loginObject(userLogged, loginStatus);
                 }
             } catch (SQLException e) {
-                response.getWriter().println("Can't login");
+
             }
         }
 
