@@ -11,6 +11,8 @@ import java.io.*;
 import java.sql.SQLException;
 import java.util.Map;
 
+import beans.loginObject;
+import beans.User;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -31,21 +33,26 @@ public class homeController extends HttpServlet {
 
         JsonObject requestData = ParameterGetter.handleRequest(request);
         Boolean loginStatus = false;
+        loginObject lo = new loginObject();
+
         String email = GsonFactory.getJsonValue(requestData, "email");
         String password = GsonFactory.getJsonValue(requestData, "password");
 
         if (email != null && password != null) {
-            String Password = password.toString();
-            String Email = email.toString();
+
             try {
-                loginStatus = userAuthenticationService.authLogin(Email,Password);
+                loginStatus = userAuthenticationService.authLogin(email,password);
+                if(loginStatus){
+                    User userLogged = userAuthenticationService.getUserForLogin(email, password);
+                    lo = new loginObject(userLogged, loginStatus);
+                }
             } catch (SQLException e) {
                 response.getWriter().println("Can't login");
             }
         }
 
         HttpServletResponse responseHeader = ResponseFactory.createResponse(response);
-        ResponseFactory.sendResponse(responseHeader, loginStatus, "loginStatus");
+        ResponseFactory.sendResponse(responseHeader, lo, "loginStatus");
 
     }
 

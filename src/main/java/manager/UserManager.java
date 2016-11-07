@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserManager {
-    private Connection conn;
+    private static Connection conn;
 
     public UserManager(Connection conn) {
         this.conn = conn;
@@ -89,5 +89,30 @@ public class UserManager {
         rs.close();
 
         return alreadyRegister;
+    }
+
+    public static User getUserFromNickname(String nickname, String password) throws SQLException {
+        String sql = "select * from user where nickname=? and password=?";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setString(1, nickname);
+        stmt.setString(1, password);
+
+        ResultSet rs = stmt.executeQuery();
+
+        User users = new User();
+
+        if (rs.next()) {
+            String email = rs.getString("email");
+            int cleverness = rs.getInt("cleverness");
+            int typeOfPlayer = rs.getInt("typeOfPlayer");
+            users = new User(email, nickname, null, cleverness, typeOfPlayer);
+            return users;
+        }
+
+        rs.close();
+
+        return null;
     }
 }

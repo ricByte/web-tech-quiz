@@ -67,4 +67,11 @@ public class userAuthenticationService {
     public static Boolean verifyEmail(String email) {
         return true;
     }
+
+    public static User getUserForLogin(String Email, String Password) throws SQLException {
+
+        User returnedUser = UserManager.getUserFromNickname(Email, Password);
+
+        return returnedUser;
+    }
 }
