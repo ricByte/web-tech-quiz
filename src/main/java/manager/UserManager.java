@@ -97,7 +97,7 @@ public class UserManager {
         PreparedStatement stmt = conn.prepareStatement(sql);
 
         stmt.setString(1, nickname);
-        stmt.setString(1, password);
+        stmt.setString(2, password);
 
         ResultSet rs = stmt.executeQuery();
 

@@ -68,9 +68,14 @@ public class userAuthenticationService {
         return true;
     }
 
-    public static User getUserForLogin(String Email, String Password) throws SQLException {
+    public static User getUserForLogin(String Email, String Password) throws SQLException, ServletException {
 
-        User returnedUser = UserManager.getUserFromNickname(Email, Password);
+        String md5Password = getMd5(Password);
+
+        DataBaseConnector dbConn = new DataBaseConnector();
+        UserManager userManager = new UserManager(dbConn.connectToDb());
+
+        User returnedUser = userManager.getUserFromNickname(Email, md5Password);
 
         return returnedUser;
     }
