@@ -26,6 +26,8 @@ public class QuestionService {
             questionObj = QuestionManager.insertQuestion(questionObj);
             response.setQuestion(questionObj);
             response.setStatus(true);
+
+            dbConn.disconnectFromDb();
         }
 
 

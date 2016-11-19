@@ -1,4 +1,4 @@
-package controller;
+package controller.question;
 
 import beans.question.QuestionResponse;
 import com.google.gson.JsonObject;

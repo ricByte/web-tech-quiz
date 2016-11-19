@@ -1,4 +1,4 @@
-package controller;
+package controller.login;
 
 
 
@@ -9,17 +9,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Map;
 
 import beans.loginObject;
 import beans.User;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import services.GsonFactory;
 import services.ParameterGetter;
 import services.ResponseFactory;
-import services.userAuthenticationService;
+import services.login.userAuthenticationService;
 
 @WebServlet(name = "homeController", urlPatterns = {"/login"})
 public class homeController extends HttpServlet {

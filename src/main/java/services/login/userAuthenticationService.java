@@ -1,8 +1,8 @@
-package services;
+package services.login;
 
 import beans.User;
 import database.DataBaseConnector;
-import manager.UserManager;
+import manager.login.UserManager;
 
 import javax.servlet.ServletException;
 import java.math.BigInteger;
@@ -46,6 +46,8 @@ public class userAuthenticationService {
         if (userCount > 0)
             return true;
 
+        dbConn.disconnectFromDb();
+
         return false;
     }
 
@@ -60,6 +62,7 @@ public class userAuthenticationService {
             userManager.register(user);
             return user;
         }
+        dbConn.disconnectFromDb();
 
         return  null;
     }
@@ -76,6 +79,7 @@ public class userAuthenticationService {
         UserManager userManager = new UserManager(dbConn.connectToDb());
 
         User returnedUser = userManager.getUserFromNickname(Email, md5Password);
+        dbConn.disconnectFromDb();
 
         return returnedUser;
     }

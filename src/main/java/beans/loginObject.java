@@ -2,12 +2,14 @@ package beans;
 
 public class loginObject {
     private User User;
+    private String session;
     private Boolean loginStatus;
 
 
     public loginObject(){
         this.User = null;
         this.loginStatus = false;
+        this.session = "";
     }
 
     public loginObject(User user, Boolean registerStatus){
@@ -29,5 +31,13 @@ public class loginObject {
 
     public void setUser(User user) {
         User = user;
+    }
+
+    public String getSession() {
+        return session;
+    }
+
+    public void setSession(String session) {
+        this.session = session;
     }
 }

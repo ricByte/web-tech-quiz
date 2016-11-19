@@ -1,4 +1,4 @@
-package controller;
+package controller.login;
 
 import beans.RegisterObject;
 
@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 import services.GsonFactory;
 import services.ParameterGetter;
 import services.ResponseFactory;
-import services.userAuthenticationService;
+import services.login.userAuthenticationService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

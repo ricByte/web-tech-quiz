@@ -28,6 +28,8 @@ public class AnswerService {
 
         }
 
+        dbConn.disconnectFromDb();
+
         return returnedAnswer;
 
     }
