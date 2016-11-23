@@ -71,6 +71,18 @@ public class QuestionManager {
                 "FROM question " +
                 "WHERE id in ("+ questionsId +")";
 
+        if (questionsId.equals("'all'")) {
+
+            query = "SELECT q.* , (SELECT count(*) " +
+                    "from answer as a " +
+                    "WHERE q.id=a.question_ID   " +
+                    ")as count_question " +
+                    "FROM question as q ";
+            queryCount = "SELECT COUNT(*) as count " +
+                    "FROM question ";
+
+        }
+
         Question[] Questions;
         int count = 0;
 
@@ -96,6 +108,7 @@ public class QuestionManager {
 
                 Questions[i].setId(rs2.getInt("id"));
                 Questions[i].setText(rs2.getString("text"));
+                Questions[i].setSolution(rs2.getInt("solution"));
                 Questions[i].setDifficulty(rs2.getString("difficulty"));
 
                 i++;
