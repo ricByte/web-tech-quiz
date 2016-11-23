@@ -2,6 +2,7 @@ package services.question;
 
 import beans.question.Answer;
 import beans.question.Question;
+import beans.question.QuestionListResponse;
 import beans.question.QuestionResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -33,6 +34,46 @@ public class QuestionService {
 
         return response;
 
+    }
+
+    public static QuestionListResponse getQuestions(JsonArray questionsId) throws ServletException {
+
+        String queryId = "";
+        Question[] questions = null;
+
+        for (int i = 0; i < questionsId.size(); i++) {
+
+            if (i > 0)
+                queryId += ",";
+
+            queryId += "'" + questionsId.get(i).getAsString() + "'";
+
+        }
+
+        QuestionListResponse response = new QuestionListResponse();
+
+        if (queryId != "") {
+
+            DataBaseConnector dbConn = new DataBaseConnector();
+            QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+
+            try {
+
+                questions = QuestionManager.getQuestion(queryId);
+
+
+                response.setQuestions(questions);
+                response.setStatus(true);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            dbConn.disconnectFromDb();
+
+        }
+
+        return response;
     }
 
     public static Question parseJsonToQuestion(JsonObject JsonQuestion) {

@@ -58,4 +58,58 @@ public class QuestionManager {
 
         return question;
     }
+
+    public static Question[] getQuestion(String questionsId) throws SQLException {
+
+        String query = "SELECT q.* , (SELECT count(*) " +
+                "from answer as a " +
+                "WHERE q.id=a.question_ID   " +
+                ")as count_question " +
+                "FROM question as q " +
+                "WHERE id in ("+ questionsId +")";
+        String queryCount = "SELECT COUNT(*) as count " +
+                "FROM question " +
+                "WHERE id in ("+ questionsId +")";
+
+        Question[] Questions;
+        int count = 0;
+
+        PreparedStatement stmt = conn.prepareStatement(queryCount);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            count = rs.getInt("count");
+        }
+
+
+        if (count > 0) {
+
+            Questions = new Question[count];
+            PreparedStatement stmt2 = conn.prepareStatement(query);
+
+            ResultSet rs2 = stmt2.executeQuery();
+            int i = 0;
+
+            while (rs2.next()) {
+
+                Questions[i] = new Question();
+
+                Questions[i].setId(rs2.getInt("id"));
+                Questions[i].setText(rs2.getString("text"));
+                Questions[i].setDifficulty(rs2.getString("difficulty"));
+
+                i++;
+            }
+
+            rs2.close();
+            stmt2.close();
+
+            return Questions;
+        }
+
+        rs.close();
+        stmt.close();
+
+        return null;
+    }
 }
