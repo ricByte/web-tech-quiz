@@ -61,7 +61,9 @@ public class QuestionService {
 
                 questions = QuestionManager.getQuestion(queryId);
 
-
+                if(questions == null) {
+                    questions = new Question[0];
+                }
                 response.setQuestions(questions);
                 response.setStatus(true);
 
