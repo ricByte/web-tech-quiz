@@ -9,11 +9,12 @@ public class Answer {
     private Question FK_Question;
     private int num;
 
-    public Answer(int id, String link, String image, String text) {
+    public Answer(int id, String link, String image, String text, int num) {
         this.id = id;
         this.link = link;
         this.image = image;
         this.text = text;
+        this.num = num;
     }
 
     public Answer() {

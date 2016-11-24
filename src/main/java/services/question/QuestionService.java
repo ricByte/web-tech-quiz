@@ -78,6 +78,30 @@ public class QuestionService {
         return response;
     }
 
+    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) throws ServletException {
+
+        QuestionListResponse questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+
+        if (questionWithOutAnswer.getQuestions().length > 0) {
+
+            for (Question question : questionWithOutAnswer.getQuestions()) {
+
+                try {
+
+                    Answer[] answer = AnswerService.getAnswers(question.getId());
+                    question.setAnswers(answer);
+
+                } catch (Exception e) {
+
+                }
+
+            }
+
+        }
+
+        return questionWithOutAnswer;
+    }
+
     public static Question parseJsonToQuestion(JsonObject JsonQuestion) {
 
         Question ReturnedQuestion = new Question();
