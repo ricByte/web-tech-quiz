@@ -3,6 +3,7 @@ package manager.question;
 import beans.question.Question;
 import com.google.gson.JsonArray;
 import services.question.AnswerService;
+import services.question.QuestionService;
 
 import javax.servlet.ServletException;
 import java.sql.*;
@@ -57,6 +58,42 @@ public class QuestionManager {
         stmt.close();
 
         return question;
+    }
+
+    /**
+     * Extract a set of values using a prefix with index es. prop1, prop2
+     * @param question the question to search in DB
+     * @returns question The object to write in the Db
+     */
+    public static Question updateQuestion(Question question) {
+
+        String updateQuestion = "UPDATE question " +
+                "SET solotion=?, text=?, difficulty=?, user_ID=?";
+
+        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+                "FROM question as q " +
+                "JOIN user as u " +
+                "ON u.id = q.user_ID " +
+                "WHERE q.id = ?";
+
+        try {
+
+            PreparedStatement stmtGet = conn.prepareStatement(getQuestion);
+
+            stmtGet.setInt(1, question.getId());
+            ResultSet rsGet = stmtGet.executeQuery();
+
+            if (rsGet.next()) {
+//                Question precQuestion = QuestionService.retrieveQuestionObject()
+                int id = 0;
+            }
+
+        } catch(Exception e) {
+
+        }
+
+        return null;
+
     }
 
     public static Question[] getQuestion(String questionsId) throws SQLException {
