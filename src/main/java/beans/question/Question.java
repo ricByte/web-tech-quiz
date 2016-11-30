@@ -1,5 +1,7 @@
 package beans.question;
 
+import beans.User;
+
 import java.sql.Array;
 
 public class Question {
@@ -9,6 +11,7 @@ public class Question {
     private Answer[] answers;
     private Integer solution;
     private String difficulty;
+    private User Creator;
 
     public Question() {
 
@@ -17,12 +20,13 @@ public class Question {
 
     }
 
-    public Question(String text, Answer[] answers, Integer solution, String difficulty, String link) {
+    public Question(int id, String text, Answer[] answers, Integer solution, String difficulty, User user) {
 
         this.text = text;
         this.answers = answers;
         this.solution = solution;
         this.difficulty = difficulty;
+        this.Creator = user;
 
     }
 
@@ -68,4 +72,19 @@ public class Question {
         this.difficulty = difficulty;
     }
 
+    public User getCreator() {
+        return Creator;
+    }
+
+    public void setCreator(User creator) {
+        Creator = creator;
+    }
+
+    public boolean equals(Question other) {
+
+
+
+        return true;
+
+    }
 }
