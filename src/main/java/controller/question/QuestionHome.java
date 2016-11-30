@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by user on 21/11/16.
- */
 @WebServlet(name = "QuestionHome", urlPatterns = {"/question/get/*"})
 public class QuestionHome extends HttpServlet {
 
