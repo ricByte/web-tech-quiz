@@ -1,5 +1,6 @@
 package services.question;
 
+import beans.User;
 import beans.question.Answer;
 import beans.question.Question;
 import beans.question.QuestionListResponse;
@@ -10,6 +11,7 @@ import database.DataBaseConnector;
 import manager.question.QuestionManager;
 
 import javax.servlet.ServletException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class QuestionService {
@@ -31,6 +33,32 @@ public class QuestionService {
             dbConn.disconnectFromDb();
         }
 
+
+        return response;
+
+    }
+
+    public static QuestionResponse saveQuestion(String session, JsonObject question) {
+
+        Question questionObj = QuestionService.parseJsonToQuestion(question);
+        QuestionResponse response = new QuestionResponse();
+
+        if (questionObj.getAnswers() != null) {
+            try {
+
+                DataBaseConnector dbConn = new DataBaseConnector();
+                QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+
+                /*questionObj = QuestionManager.insertQuestion(questionObj);
+                response.setQuestion(questionObj);
+                response.setStatus(true);*/
+
+                dbConn.disconnectFromDb();
+
+            }catch(Exception e) {
+
+            }
+        }
 
         return response;
 
@@ -126,6 +154,12 @@ public class QuestionService {
 
         }
 
+        try {
+            ReturnedQuestion.setId(JsonQuestion.get("id").getAsInt());
+        } catch(Exception e) {
+
+        }
+
         return ReturnedQuestion;
 
     }
@@ -167,6 +201,14 @@ public class QuestionService {
 
             tempAnswer.setNum(number);
 
+            try {
+
+                tempAnswer.setId(answerJson.get("id").getAsInt());
+
+            }catch(Exception e) {
+
+            }
+
             switch (type) {
 
                 case "image":
@@ -186,6 +228,36 @@ public class QuestionService {
         }
 
         return answersFilled;
+    }
+
+    /**
+     * Create the question object retrieved from the DB
+     * @param rs The result of the query
+     * @return Question The object Question
+     */
+    public static Question retrieveQuestionObject (ResultSet rs) {
+
+        try {
+
+            int id = rs.getInt("id");
+
+            String text = rs.getString("text");
+
+            int solution = rs.getInt("solution");
+
+            String difficulty = rs.getString("difficulty");
+
+            int user_ID = rs.getInt("user_ID");
+            User tempUser = new User();
+            tempUser.setId(user_ID);
+
+            return new Question(id, text, new Answer[0], solution, difficulty, tempUser);
+
+        } catch(Exception e) {
+
+        }
+
+        return null;
     }
 
 }
