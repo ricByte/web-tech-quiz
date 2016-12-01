@@ -15,7 +15,7 @@
     import java.io.IOException;
     import java.sql.SQLException;
 
-    @WebServlet(name = "QuestionPersist", urlPatterns = {"/question"})
+    @WebServlet(name = "QuestionPersist", urlPatterns = {"/question/persist"})
     public class QuestionPersist extends HttpServlet {
 
         public QuestionPersist() {
