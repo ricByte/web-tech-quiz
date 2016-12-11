@@ -3,6 +3,7 @@ package beans.question;
 import beans.User;
 
 import java.sql.Array;
+import java.util.Date;
 
 public class Question {
 
@@ -12,6 +13,7 @@ public class Question {
     private Integer solution;
     private String difficulty;
     private User Creator;
+    private Date lastModify;
 
     public Question() {
 
@@ -20,13 +22,15 @@ public class Question {
 
     }
 
-    public Question(int id, String text, Answer[] answers, Integer solution, String difficulty, User user) {
+    public Question(int id, String text, Answer[] answers, Integer solution, String difficulty, User user, Date lastModify) {
 
+        this.id = id;
         this.text = text;
         this.answers = answers;
         this.solution = solution;
         this.difficulty = difficulty;
         this.Creator = user;
+        this.lastModify = lastModify;
 
     }
 
@@ -80,9 +84,15 @@ public class Question {
         Creator = creator;
     }
 
+    public Date getLastModify() {
+        return lastModify;
+    }
+
+    public void setLastModify(Date lastModify) {
+        this.lastModify = lastModify;
+    }
+
     public boolean equals(Question other) {
-
-
 
         return true;
 

@@ -98,23 +98,21 @@ public class QuestionManager {
 
     public static Question[] getQuestion(String questionsId) throws SQLException {
 
-        String query = "SELECT q.* , (SELECT count(*) " +
-                "from answer as a " +
-                "WHERE q.id=a.question_ID   " +
-                ")as count_question " +
+        String query = "SELECT q.* , u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
                 "FROM question as q " +
-                "WHERE id in ("+ questionsId +")";
+                "JOIN user as u " +
+                "ON u.id = q.user_ID " +
+                "WHERE q.id in ("+ questionsId +")";
         String queryCount = "SELECT COUNT(*) as count " +
                 "FROM question " +
                 "WHERE id in ("+ questionsId +")";
 
         if (questionsId.equals("'all'")) {
 
-            query = "SELECT q.* , (SELECT count(*) " +
-                    "from answer as a " +
-                    "WHERE q.id=a.question_ID   " +
-                    ")as count_question " +
-                    "FROM question as q ";
+            query = "SELECT q.* , u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+                    "FROM question as q " +
+                    "JOIN user as u " +
+                    "ON u.id = q.user_ID";
             queryCount = "SELECT COUNT(*) as count " +
                     "FROM question ";
 
@@ -141,12 +139,7 @@ public class QuestionManager {
 
             while (rs2.next()) {
 
-                Questions[i] = new Question();
-
-                Questions[i].setId(rs2.getInt("id"));
-                Questions[i].setText(rs2.getString("text"));
-                Questions[i].setSolution(rs2.getInt("solution"));
-                Questions[i].setDifficulty(rs2.getString("difficulty"));
+                Questions[i] = QuestionService.retrieveQuestionObject(rs2);
 
                 i++;
             }

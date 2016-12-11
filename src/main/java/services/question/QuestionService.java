@@ -9,8 +9,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import database.DataBaseConnector;
 import manager.question.QuestionManager;
+import services.ParameterGetter;
 
 import javax.servlet.ServletException;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -240,18 +242,25 @@ public class QuestionService {
         try {
 
             int id = rs.getInt("id");
-
             String text = rs.getString("text");
-
             int solution = rs.getInt("solution");
-
             String difficulty = rs.getString("difficulty");
-
             int user_ID = rs.getInt("user_ID");
+            Date lastModify = ParameterGetter.getDateFromDateTime(rs, "last_modify");
+
+            String email = rs.getString("email");
+            String nickname = rs.getString("nickname");
+            int cleverness = rs.getInt("cleverness");
+            int typeof = rs.getInt("typeOfPlayer");
+
             User tempUser = new User();
             tempUser.setId(user_ID);
+            tempUser.setCleverness(cleverness);
+            tempUser.setEmail(email);
+            tempUser.setTypeOfPlayer(typeof);
+            tempUser.setNickname(nickname);
 
-            return new Question(id, text, new Answer[0], solution, difficulty, tempUser);
+            return new Question(id, text, new Answer[0], solution, difficulty, tempUser, lastModify);
 
         } catch(Exception e) {
 
