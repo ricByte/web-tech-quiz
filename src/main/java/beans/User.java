@@ -2,6 +2,7 @@ package beans;
 
 public class User {
 
+    private int id;
     private String email;
     private String nickname;
     private String password;
@@ -65,5 +66,33 @@ public class User {
 
     public void setTypeOfPlayer(int typeOfPlayer) {
         this.typeOfPlayer = typeOfPlayer;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean equals(User other) {
+
+        if(other.getId() != this.getId())
+            return false;
+
+        if(other.getCleverness() != this.getCleverness())
+            return false;
+
+        if(other.getTypeOfPlayer() != this.getTypeOfPlayer())
+            return false;
+
+        if(other.getNickname() != this.getNickname())
+            return false;
+
+        if(other.getEmail() != this.getEmail())
+            return false;
+
+        return true;
     }
 }

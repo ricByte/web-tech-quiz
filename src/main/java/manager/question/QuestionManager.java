@@ -3,6 +3,7 @@ package manager.question;
 import beans.question.Question;
 import com.google.gson.JsonArray;
 import services.question.AnswerService;
+import services.question.QuestionService;
 
 import javax.servlet.ServletException;
 import java.sql.*;
@@ -57,5 +58,101 @@ public class QuestionManager {
         stmt.close();
 
         return question;
+    }
+
+    /**
+     * Extract a set of values using a prefix with index es. prop1, prop2
+     * @param question the question to search in DB
+     * @returns question The object to write in the Db
+     */
+    public static Question updateQuestion(Question question) {
+
+        String updateQuestion = "UPDATE question " +
+                "SET solotion=?, text=?, difficulty=?, user_ID=?";
+
+        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+                "FROM question as q " +
+                "JOIN user as u " +
+                "ON u.id = q.user_ID " +
+                "WHERE q.id = ?";
+
+        try {
+
+            PreparedStatement stmtGet = conn.prepareStatement(getQuestion);
+
+            stmtGet.setInt(1, question.getId());
+            ResultSet rsGet = stmtGet.executeQuery();
+
+            if (rsGet.next()) {
+//                Question precQuestion = QuestionService.retrieveQuestionObject()
+                int id = 0;
+            }
+
+        } catch(Exception e) {
+
+        }
+
+        return null;
+
+    }
+
+    public static Question[] getQuestion(String questionsId) throws SQLException {
+
+        String query = "SELECT q.* , u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+                "FROM question as q " +
+                "JOIN user as u " +
+                "ON u.id = q.user_ID " +
+                "WHERE q.id in ("+ questionsId +")";
+        String queryCount = "SELECT COUNT(*) as count " +
+                "FROM question " +
+                "WHERE id in ("+ questionsId +")";
+
+        if (questionsId.equals("'all'")) {
+
+            query = "SELECT q.* , u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+                    "FROM question as q " +
+                    "JOIN user as u " +
+                    "ON u.id = q.user_ID";
+            queryCount = "SELECT COUNT(*) as count " +
+                    "FROM question ";
+
+        }
+
+        Question[] Questions;
+        int count = 0;
+
+        PreparedStatement stmt = conn.prepareStatement(queryCount);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            count = rs.getInt("count");
+        }
+
+
+        if (count > 0) {
+
+            Questions = new Question[count];
+            PreparedStatement stmt2 = conn.prepareStatement(query);
+
+            ResultSet rs2 = stmt2.executeQuery();
+            int i = 0;
+
+            while (rs2.next()) {
+
+                Questions[i] = QuestionService.retrieveQuestionObject(rs2);
+
+                i++;
+            }
+
+            rs2.close();
+            stmt2.close();
+
+            return Questions;
+        }
+
+        rs.close();
+        stmt.close();
+
+        return null;
     }
 }

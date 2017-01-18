@@ -1,6 +1,7 @@
 package manager.question;
 
 import beans.question.Answer;
+import services.question.AnswerService;
 
 import java.sql.*;
 
@@ -56,6 +57,64 @@ public class AnswerManager {
         stmt.close();
 
         return id;
+    }
+
+    public static Answer[] getAnswersFromQuestionId(int QuestionId) throws SQLException {
+
+        String query = "SELECT * " +
+                "FROM answer as a " +
+                "WHERE question_ID = ?";
+
+        String queryCount = "SELECT COUNT(*) as count " +
+                "FROM answer as a " +
+                "WHERE question_ID = ?";
+
+
+        Answer[] answers;
+        int count = 0;
+
+        PreparedStatement stmt = conn.prepareStatement(queryCount);
+        stmt.setInt(1, QuestionId);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        if (count > 0) {
+
+            answers = new Answer[count];
+            PreparedStatement stmt2 = conn.prepareStatement(query);
+            stmt2.setInt(1, QuestionId);
+
+            ResultSet rs2 = stmt2.executeQuery();
+            int i = 0;
+
+            while (rs2.next()) {
+
+                Answer tempAnswer = AnswerService.createAnswer(rs2);
+
+                if (tempAnswer != null) {
+
+                    answers[i] = tempAnswer;
+
+                    i++;
+                }
+
+            }
+
+            rs2.close();
+            stmt2.close();
+
+            return answers;
+        }
+
+        rs.close();
+        stmt.close();
+
+        return null;
+
     }
 
 }

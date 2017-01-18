@@ -1,14 +1,19 @@
 package services.question;
 
+import beans.User;
 import beans.question.Answer;
 import beans.question.Question;
+import beans.question.QuestionListResponse;
 import beans.question.QuestionResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import database.DataBaseConnector;
 import manager.question.QuestionManager;
+import services.ParameterGetter;
 
 import javax.servlet.ServletException;
+import java.util.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class QuestionService {
@@ -35,6 +40,98 @@ public class QuestionService {
 
     }
 
+    public static QuestionResponse saveQuestion(String session, JsonObject question) {
+
+        Question questionObj = QuestionService.parseJsonToQuestion(question);
+        QuestionResponse response = new QuestionResponse();
+
+        if (questionObj.getAnswers() != null) {
+            try {
+
+                DataBaseConnector dbConn = new DataBaseConnector();
+                QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+
+                /*questionObj = QuestionManager.insertQuestion(questionObj);
+                response.setQuestion(questionObj);
+                response.setStatus(true);*/
+
+                dbConn.disconnectFromDb();
+
+            }catch(Exception e) {
+
+            }
+        }
+
+        return response;
+
+    }
+
+    public static QuestionListResponse getQuestions(JsonArray questionsId) throws ServletException {
+
+        String queryId = "";
+        Question[] questions = null;
+
+        for (int i = 0; i < questionsId.size(); i++) {
+
+            if (i > 0)
+                queryId += ",";
+
+            queryId += "'" + questionsId.get(i).getAsString() + "'";
+
+        }
+
+        QuestionListResponse response = new QuestionListResponse();
+
+        if (queryId != "") {
+
+            DataBaseConnector dbConn = new DataBaseConnector();
+            QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+
+            try {
+
+                questions = QuestionManager.getQuestion(queryId);
+
+                if(questions == null) {
+                    questions = new Question[0];
+                }
+                response.setQuestions(questions);
+                response.setStatus(true);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            dbConn.disconnectFromDb();
+
+        }
+
+        return response;
+    }
+
+    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) throws ServletException {
+
+        QuestionListResponse questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+
+        if (questionWithOutAnswer.getQuestions().length > 0) {
+
+            for (Question question : questionWithOutAnswer.getQuestions()) {
+
+                try {
+
+                    Answer[] answer = AnswerService.getAnswers(question.getId());
+                    question.setAnswers(answer);
+
+                } catch (Exception e) {
+
+                }
+
+            }
+
+        }
+
+        return questionWithOutAnswer;
+    }
+
     public static Question parseJsonToQuestion(JsonObject JsonQuestion) {
 
         Question ReturnedQuestion = new Question();
@@ -56,6 +153,12 @@ public class QuestionService {
 
 
         } catch(Exception ex) {
+
+        }
+
+        try {
+            ReturnedQuestion.setId(JsonQuestion.get("id").getAsInt());
+        } catch(Exception e) {
 
         }
 
@@ -100,6 +203,14 @@ public class QuestionService {
 
             tempAnswer.setNum(number);
 
+            try {
+
+                tempAnswer.setId(answerJson.get("id").getAsInt());
+
+            }catch(Exception e) {
+
+            }
+
             switch (type) {
 
                 case "image":
@@ -119,6 +230,43 @@ public class QuestionService {
         }
 
         return answersFilled;
+    }
+
+    /**
+     * Create the question object retrieved from the DB
+     * @param rs The result of the query
+     * @return Question The object Question
+     */
+    public static Question retrieveQuestionObject (ResultSet rs) {
+
+        try {
+
+            int id = rs.getInt("id");
+            String text = rs.getString("text");
+            int solution = rs.getInt("solution");
+            String difficulty = rs.getString("difficulty");
+            int user_ID = rs.getInt("user_ID");
+            Date lastModify = ParameterGetter.getDateFromDateTime(rs, "last_modify");
+
+            String email = rs.getString("email");
+            String nickname = rs.getString("nickname");
+            int cleverness = rs.getInt("cleverness");
+            int typeof = rs.getInt("typeOfPlayer");
+
+            User tempUser = new User();
+            tempUser.setId(user_ID);
+            tempUser.setCleverness(cleverness);
+            tempUser.setEmail(email);
+            tempUser.setTypeOfPlayer(typeof);
+            tempUser.setNickname(nickname);
+
+            return new Question(id, text, new Answer[0], solution, difficulty, tempUser, lastModify);
+
+        } catch(Exception e) {
+
+        }
+
+        return null;
     }
 
 }
