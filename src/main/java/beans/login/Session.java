@@ -2,12 +2,13 @@ package beans.login;
 
 import beans.User;
 
-import java.util.Date;
+import java.sql.Timestamp;
+import java.util.GregorianCalendar;
 
 public class Session {
     private User userId = null;
     private String session = null;
-    private Date validUntil = null;
+    private GregorianCalendar validUntil = null;
 
     public User getUserId() {
         return userId;
@@ -25,11 +26,17 @@ public class Session {
         this.session = session;
     }
 
-    public Date getValidUntil() {
+    public GregorianCalendar getValidUntil() {
         return validUntil;
     }
 
-    public void setValidUntil(Date validUntil) {
+    public void setValidUntil(GregorianCalendar validUntil) {
         this.validUntil = validUntil;
+    }
+
+    public void setValidUntil(Timestamp timestamp) {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(timestamp.getTime());
+        this.validUntil = cal;
     }
 }

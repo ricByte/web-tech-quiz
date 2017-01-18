@@ -6,6 +6,7 @@ import services.utils.DateParser;
 import services.utils.RandomAlphaNum;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -23,7 +24,7 @@ public class userService {
 
             String sessionNumber = rs.getString("session");
             int userId = rs.getInt("user_ID");
-            Date valid_until = rs.getDate("valid_until");
+            Timestamp valid_until = rs.getTimestamp("valid_until");
 
             User user = new User();
             user.setId(userId);
@@ -81,9 +82,11 @@ public class userService {
 
     }
 
-    public static Date generateValidDate() {
+    public static GregorianCalendar generateValidDate() {
 
-        return DateParser.addMin(new Date(), MinutesSessionValidity);
+        GregorianCalendar gc = new GregorianCalendar();
+        DateParser.addMin(gc, MinutesSessionValidity);
+        return gc;
 
     }
 }

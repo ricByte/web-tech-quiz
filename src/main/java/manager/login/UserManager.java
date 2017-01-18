@@ -185,7 +185,7 @@ public class UserManager {
 
             stmt.setInt(1, sessionToSave.getUserId().getId());
             stmt.setString(2, sessionToSave.getSession());
-            stmt.setTimestamp(3, new java.sql.Timestamp(sessionToSave.getValidUntil().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(sessionToSave.getValidUntil().getTimeInMillis()));
             stmt.executeUpdate();
 
             stmt.close();

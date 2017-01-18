@@ -4,33 +4,33 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DateParser {
 
-    static final long ONE_MINUTE_IN_MILLIS = 60000;
+    static String formatDate = "yyyy-MM-dd HH:mm:ss";
 
     public static Date parseString(String date) {
         try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+            return new SimpleDateFormat(formatDate).parse(date);
         } catch (ParseException e) {
             return null;
         }
     }
 
-    public static Date parseDate(Date date) {
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date.toString());
-        } catch (ParseException e) {
-            return null;
-        }
+    public static String parseDate(GregorianCalendar date) {
+
+        SimpleDateFormat fmt = new SimpleDateFormat(formatDate);
+        fmt.setCalendar(date);
+
+        String dateFormatted = fmt.format(date.getTime());
+        return dateFormatted;
+
     }
 
-    public static Date addMin(Date date, int minutes) {
+    public static void addMin(GregorianCalendar date, int minutes) {
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        long t = cal.getTimeInMillis();
-        return new Date(t + (minutes * ONE_MINUTE_IN_MILLIS));
+        date.add((GregorianCalendar.MINUTE), minutes);
 
     }
 }
