@@ -1,6 +1,8 @@
 package services.login;
 
 import beans.User;
+import beans.login.Session;
+import beans.login.loginObject;
 import database.DataBaseConnector;
 import manager.login.UserManager;
 
@@ -34,21 +36,49 @@ public class userAuthenticationService {
         return md5;
     }
 
-    public static Boolean authLogin(String email, String password) throws ServletException, SQLException {
+    public static loginObject authLogin(String email, String password)  {
         String md5Password = getMd5(password);
 
-        DataBaseConnector dbConn = new DataBaseConnector();
-        UserManager userManager = new UserManager(dbConn.connectToDb());
+        try {
+            DataBaseConnector dbConn = new DataBaseConnector();
+            UserManager userManager = new UserManager(dbConn.connectToDb());
 
-        User user = new User(email, md5Password);
-        int userCount = userManager.login(user);
+            User user = new User(email, md5Password);
+            int userCount = userManager.userExist(user);
 
-        if (userCount > 0)
-            return true;
+            if (userCount > 0) {
 
-        dbConn.disconnectFromDb();
+                Session sessionSaved = userManager.getSessionFromUser(user);
+                User savedUser;
 
-        return false;
+                //check if has session valid
+                if (sessionSaved != null) {
+
+                    savedUser = userManager.getUserById(sessionSaved.getUserId().getId());
+
+                } else {
+
+                    savedUser = userManager.getUserByNickname(user);
+                    sessionSaved = new Session();
+                    sessionSaved.setUserId(savedUser);
+                    sessionSaved.setSession(userService.generateSessionNumber());
+                    sessionSaved.setValidUntil(userService.generateValidDate());
+                    if (userManager.insertSession(sessionSaved) == null)
+                        return loginObject.createFailedLoginObject();
+
+                }
+
+                return loginObject.createSuccessfullLogin(savedUser, sessionSaved);
+            }
+
+            dbConn.disconnectFromDb();
+
+            return loginObject.createFailedLoginObject();
+
+        } catch(Exception e) {
+            return null;
+        }
+
     }
 
     public static User registerUser(String email, String password, String nickname, int cleverness, int typeOfPlayer) throws ServletException, SQLException {
@@ -69,18 +99,5 @@ public class userAuthenticationService {
 
     public static Boolean verifyEmail(String email) {
         return true;
-    }
-
-    public static User getUserForLogin(String Email, String Password) throws SQLException, ServletException {
-
-        String md5Password = getMd5(Password);
-
-        DataBaseConnector dbConn = new DataBaseConnector();
-        UserManager userManager = new UserManager(dbConn.connectToDb());
-
-        User returnedUser = userManager.getUserFromNickname(Email, md5Password);
-        dbConn.disconnectFromDb();
-
-        return returnedUser;
     }
 }

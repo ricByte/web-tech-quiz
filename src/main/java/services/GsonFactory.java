@@ -1,17 +1,25 @@
 package services;
 
 import beans.GsonResponse;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import services.utils.DateParser;
 
 
+import java.lang.reflect.Type;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GsonFactory {
     public static String constructJson(String status, int error, Object objectToConvert, String property) {
-        Gson GsonParser = new Gson();
+
+        Gson GsonParser = new GsonBuilder()
+                .registerTypeAdapter(GregorianCalendar.class, new JsonSerializer<GregorianCalendar>() {
+                    public JsonElement serialize(GregorianCalendar date, Type type, JsonSerializationContext context) {
+                        return new JsonPrimitive(DateParser.parseDate(date));
+                    }
+                }).create();
+
         Map objectMap = new HashMap();
 
         objectMap.put(property, objectToConvert);

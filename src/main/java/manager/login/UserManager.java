@@ -1,6 +1,8 @@
 package manager.login;
 
 import beans.User;
+import beans.login.Session;
+import services.login.userService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,9 +33,46 @@ public class UserManager {
 
     }
 
-    public int login(User user) throws SQLException {
+    public int userExist(User user) {
 
         String sql = "select count(*) as count from user where nickname=? and password=?";
+
+        try {
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, user.getNickname());
+            stmt.setString(2, user.getPassword());
+
+            ResultSet rs = stmt.executeQuery();
+
+            int count = 0;
+
+            if (rs.next()) {
+                count = rs.getInt("count");
+            }
+
+            rs.close();
+
+            return count;
+
+        } catch (Exception e) {
+
+            return 0;
+
+        }
+
+    }
+
+    public Session getSessionFromUser(User user) throws SQLException {
+
+        String sql = "select s.*  " +
+                "from sessions as s " +
+                "join user as u " +
+                "on u.id = s.user_ID " +
+                "where (valid_until > NOW()) " +
+                "AND u.nickname = ? " +
+                "AND u.password = ?";
 
         PreparedStatement stmt = conn.prepareStatement(sql);
 
@@ -42,15 +81,61 @@ public class UserManager {
 
         ResultSet rs = stmt.executeQuery();
 
-        int count = 0;
-
         if (rs.next()) {
-            count = rs.getInt("count");
+
+            return userService.createSession(rs);
+
         }
 
         rs.close();
 
-        return count;
+        return null;
+    }
+
+    public static User getUserById(int userId) throws SQLException {
+        String sql ="select * " +
+                    "from user as u " +
+                    "where u.id = ? ";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setInt(1, userId);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+
+            return userService.createUser(rs);
+
+        }
+
+        rs.close();
+
+        return null;
+    }
+
+    public static User getUserByNickname(User user) throws SQLException {
+        String sql ="SELECT * " +
+                    "FROM user AS u " +
+                    "WHERE u.nickname = ? " +
+                    "AND u.password = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        stmt.setString(1, user.getNickname());
+        stmt.setString(2, user.getPassword());
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+
+            return userService.createUser(rs);
+
+        }
+
+        rs.close();
+
+        return null;
     }
 
     public void register(User user) throws SQLException {
@@ -91,28 +176,25 @@ public class UserManager {
         return alreadyRegister;
     }
 
-    public static User getUserFromNickname(String nickname, String password) throws SQLException {
-        String sql = "select * from user where nickname=? and password=?";
+    public static Session insertSession(Session sessionToSave) {
+        String sql = "insert into sessions (user_ID, session, valid_until) values (?, ?, ?)";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
+        try {
 
-        stmt.setString(1, nickname);
-        stmt.setString(2, password);
+            PreparedStatement stmt = conn.prepareStatement(sql);
 
-        ResultSet rs = stmt.executeQuery();
+            stmt.setInt(1, sessionToSave.getUserId().getId());
+            stmt.setString(2, sessionToSave.getSession());
+            stmt.setTimestamp(3, new java.sql.Timestamp(sessionToSave.getValidUntil().getTimeInMillis()));
+            stmt.executeUpdate();
 
-        User users = new User();
+            stmt.close();
 
-        if (rs.next()) {
-            String email = rs.getString("email");
-            int cleverness = rs.getInt("cleverness");
-            int typeOfPlayer = rs.getInt("typeOfPlayer");
-            users = new User(email, nickname, null, cleverness, typeOfPlayer);
-            return users;
+            return sessionToSave;
+
+        } catch (Exception e) {
+            return null;
         }
 
-        rs.close();
-
-        return null;
     }
 }
