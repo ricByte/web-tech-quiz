@@ -35,22 +35,27 @@ public class AnswerService {
 
     }
 
-    public static Answer[] getAnswers(int QuestionId) throws SQLException, ServletException {
-
-        DataBaseConnector dbConn = new DataBaseConnector();
-        AnswerManager AnswerManager = new AnswerManager(dbConn.connectToDb());
-
+    public static Answer[] getAnswers(int QuestionId) {
         Answer[] responsedAnswer = new Answer[0];
-
         try {
 
-          responsedAnswer = AnswerManager.getAnswersFromQuestionId(QuestionId);
+            DataBaseConnector dbConn = new DataBaseConnector();
+            AnswerManager AnswerManager = new AnswerManager(dbConn.connectToDb());
 
-        } catch(Exception e) {
+            try {
+
+                responsedAnswer = AnswerManager.getAnswersFromQuestionId(QuestionId);
+
+            } catch(Exception e) {
+
+            }
+
+            dbConn.disconnectFromDb();
+
+
+        }catch(Exception e) {
 
         }
-
-        dbConn.disconnectFromDb();
 
         return responsedAnswer;
 

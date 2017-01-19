@@ -51,9 +51,9 @@ public class QuestionService {
                 DataBaseConnector dbConn = new DataBaseConnector();
                 QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
 
-                /*questionObj = QuestionManager.insertQuestion(questionObj);
+                questionObj = QuestionManager.updateQuestion(questionObj);
                 response.setQuestion(questionObj);
-                response.setStatus(true);*/
+                response.setStatus(true);
 
                 dbConn.disconnectFromDb();
 
@@ -238,7 +238,7 @@ public class QuestionService {
      * @return Question The object Question
      */
     public static Question retrieveQuestionObject (ResultSet rs) {
-
+        System.out.println("bella");
         try {
 
             int id = rs.getInt("id");

@@ -62,6 +62,7 @@ public class QuestionManager {
 
     /**
      * Extract a set of values using a prefix with index es. prop1, prop2
+     *
      * @param question the question to search in DB
      * @returns question The object to write in the Db
      */
@@ -70,11 +71,15 @@ public class QuestionManager {
         String updateQuestion = "UPDATE question " +
                 "SET solotion=?, text=?, difficulty=?, user_ID=?";
 
-        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
+        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer, GROUP_CONCAT(a.id) " +
                 "FROM question as q " +
                 "JOIN user as u " +
                 "ON u.id = q.user_ID " +
+                "JOIN  answer as a " +
+                "ON a.question_ID = q.id " +
                 "WHERE q.id = ?";
+
+        Question questionUpdated = new Question();
 
         try {
 
@@ -84,15 +89,19 @@ public class QuestionManager {
             ResultSet rsGet = stmtGet.executeQuery();
 
             if (rsGet.next()) {
-//                Question precQuestion = QuestionService.retrieveQuestionObject()
-                int id = 0;
+
+                questionUpdated = QuestionService.retrieveQuestionObject(rsGet);
+                questionUpdated.setAnswers(AnswerService.getAnswers(questionUpdated.getId()));
+
             }
 
         } catch(Exception e) {
 
+            questionUpdated = new Question();
+
         }
 
-        return null;
+        return questionUpdated;
 
     }
 
