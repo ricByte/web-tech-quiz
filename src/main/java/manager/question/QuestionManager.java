@@ -7,6 +7,7 @@ import services.question.QuestionService;
 
 import javax.servlet.ServletException;
 import java.sql.*;
+import java.util.GregorianCalendar;
 
 public class QuestionManager {
     private static Connection conn;
@@ -66,17 +67,12 @@ public class QuestionManager {
      * @param question the question to search in DB
      * @returns question The object to write in the Db
      */
-    public static Question updateQuestion(Question question) {
+    public static Question getQuestionFullObject(Question question) {
 
-        String updateQuestion = "UPDATE question " +
-                "SET solotion=?, text=?, difficulty=?, user_ID=?";
-
-        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer, GROUP_CONCAT(a.id) " +
+        String getQuestion = "SELECT q.*, u.id, u.email, u.nickname, u.cleverness, u.typeOfPlayer " +
                 "FROM question as q " +
                 "JOIN user as u " +
                 "ON u.id = q.user_ID " +
-                "JOIN  answer as a " +
-                "ON a.question_ID = q.id " +
                 "WHERE q.id = ?";
 
         Question questionUpdated = new Question();
@@ -98,6 +94,46 @@ public class QuestionManager {
         } catch(Exception e) {
 
             questionUpdated = new Question();
+
+        }
+
+        return questionUpdated;
+
+    }
+
+    public static Question updateQuestion(Question question) {
+
+        String updateQuestion = "UPDATE question as q " +
+                "SET solution = ( " +
+                "    SELECT a.id " +
+                "    FROM answer as a " +
+                "    WHERE a.num = ? " +
+                "    AND a.question_ID = q.id " +
+                "), text = ?, difficulty = ? " +
+                "WHERE q.id = ?";
+        //TODO add last_modify
+        //TODO add parseDate method to java.sql
+        Question questionUpdated = null;
+
+        try {
+
+            if (AnswerService.UpdateAnswers(question.getAnswers()) != null) {
+
+                PreparedStatement stmtGet = conn.prepareStatement(updateQuestion);
+
+                stmtGet.setInt(1, question.getSolution());
+                stmtGet.setString(2, question.getText());
+                stmtGet.setString(3, question.getDifficulty());
+                stmtGet.setInt(4, question.getId());
+                stmtGet.executeUpdate();
+
+                stmtGet.close();
+
+                questionUpdated = question;
+
+            }
+
+        } catch(Exception e) {
 
         }
 

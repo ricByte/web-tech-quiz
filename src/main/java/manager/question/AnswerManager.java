@@ -116,5 +116,40 @@ public class AnswerManager {
         return null;
 
     }
+    
+    public static Answer updateAnswer(Answer answer) {
+
+        Answer answerReturned = null;
+
+        String updateAnswer = "UPDATE answer " +
+                "SET link=?, text=?, image=?, num=? " +
+                "WHERE num = ? " +
+                "AND question_ID = ?";
+
+
+        try {
+
+            PreparedStatement stmtUpdate = conn.prepareStatement(updateAnswer, Statement.RETURN_GENERATED_KEYS);
+
+            stmtUpdate.setString(1, answer.getLink());
+            stmtUpdate.setString(2, answer.getText());
+            stmtUpdate.setString(3, answer.getImage());
+            stmtUpdate.setInt(4, answer.getNum());
+            stmtUpdate.setInt(5, answer.getNum());
+            stmtUpdate.setInt(6, answer.getFK_Question().getId());
+
+            stmtUpdate.executeUpdate();
+
+            answerReturned = answer;
+
+            stmtUpdate.close();
+
+        } catch (Exception e) {
+
+        }
+
+        return answerReturned;
+        
+    }
 
 }

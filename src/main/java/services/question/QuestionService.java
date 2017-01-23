@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import database.DataBaseConnector;
 import manager.question.QuestionManager;
 import services.ParameterGetter;
+import services.login.userService;
 
 import javax.servlet.ServletException;
 import java.util.Date;
@@ -44,16 +45,25 @@ public class QuestionService {
 
         Question questionObj = QuestionService.parseJsonToQuestion(question);
         QuestionResponse response = new QuestionResponse();
+        response.setStatus(false);
+
+        //TODO add check user permission
 
         if (questionObj.getAnswers() != null) {
             try {
 
                 DataBaseConnector dbConn = new DataBaseConnector();
                 QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+                Question questionAlreadySave = QuestionManager.getQuestionFullObject(questionObj);
 
-                questionObj = QuestionManager.updateQuestion(questionObj);
-                response.setQuestion(questionObj);
-                response.setStatus(true);
+                if (!questionAlreadySave.isEmpty()) {
+
+                    questionObj = QuestionManager.updateQuestion(questionObj);
+
+                    if (!questionObj.isEmpty())
+                        response.setStatus(true);
+
+                }
 
                 dbConn.disconnectFromDb();
 
@@ -61,6 +71,8 @@ public class QuestionService {
 
             }
         }
+
+        response.setQuestion(questionObj);
 
         return response;
 
@@ -141,11 +153,13 @@ public class QuestionService {
             String text = JsonQuestion.get("text").getAsString();
             String difficulty = JsonQuestion.get("difficulty").getAsString();
             int solution = JsonQuestion.get("solution").getAsInt();
+            int QuestionId = JsonQuestion.get("id").getAsInt();
 
             JsonArray answers = JsonQuestion.get("answers").getAsJsonArray();
 
-            Answer[] filledAnswers = QuestionService.fillAnswer(answers);
+            Answer[] filledAnswers = QuestionService.fillAnswer(answers, QuestionId);
 
+            ReturnedQuestion.setId(QuestionId);
             ReturnedQuestion.setAnswers(filledAnswers);
             ReturnedQuestion.setText(text);
             ReturnedQuestion.setDifficulty(difficulty);
@@ -156,17 +170,11 @@ public class QuestionService {
 
         }
 
-        try {
-            ReturnedQuestion.setId(JsonQuestion.get("id").getAsInt());
-        } catch(Exception e) {
-
-        }
-
         return ReturnedQuestion;
 
     }
 
-    private static Answer[]  fillAnswer(JsonArray anwers) {
+    private static Answer[]  fillAnswer(JsonArray anwers, int QuestionId) {
 
         Answer[] answersFilled = new Answer[0];
 
@@ -202,6 +210,8 @@ public class QuestionService {
             Answer tempAnswer = new Answer();
 
             tempAnswer.setNum(number);
+            tempAnswer.setFK_Question((new Question()));
+            tempAnswer.getFK_Question().setId(QuestionId);
 
             try {
 
@@ -238,7 +248,7 @@ public class QuestionService {
      * @return Question The object Question
      */
     public static Question retrieveQuestionObject (ResultSet rs) {
-        System.out.println("bella");
+
         try {
 
             int id = rs.getInt("id");
