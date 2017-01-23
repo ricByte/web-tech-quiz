@@ -38,14 +38,7 @@
 
                 if (sizeOfQuestion > 0 && answers > 0) {
 
-                    try {
-
-                        responseObj = QuestionService.saveQuestion(session, question);
-
-                    } catch (Exception e) {
-                        HttpServletResponse responseHeader = ResponseFactory.createResponse(response);
-                        ResponseFactory.sendResponse(responseHeader, responseObj, "persistQuestion", 412);
-                    }
+                    responseObj = QuestionService.saveQuestion(session, question);
 
                 } else {
 

@@ -2,11 +2,8 @@ package services.question;
 
 
 import beans.question.Answer;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import database.DataBaseConnector;
 import manager.question.AnswerManager;
-import manager.question.QuestionManager;
 
 import javax.servlet.ServletException;
 import java.sql.ResultSet;
@@ -35,24 +32,67 @@ public class AnswerService {
 
     }
 
-    public static Answer[] getAnswers(int QuestionId) throws SQLException, ServletException {
-
-        DataBaseConnector dbConn = new DataBaseConnector();
-        AnswerManager AnswerManager = new AnswerManager(dbConn.connectToDb());
-
+    public static Answer[] getAnswers(int QuestionId) {
         Answer[] responsedAnswer = new Answer[0];
-
         try {
 
-          responsedAnswer = AnswerManager.getAnswersFromQuestionId(QuestionId);
+            DataBaseConnector dbConn = new DataBaseConnector();
+            AnswerManager AnswerManager = new AnswerManager(dbConn.connectToDb());
 
-        } catch(Exception e) {
+            try {
+
+                responsedAnswer = AnswerManager.getAnswersFromQuestionId(QuestionId);
+
+            } catch(Exception e) {
+
+            }
+
+            dbConn.disconnectFromDb();
+
+
+        }catch(Exception e) {
 
         }
 
-        dbConn.disconnectFromDb();
-
         return responsedAnswer;
+
+    }
+
+    public static Answer[] UpdateAnswers(Answer[] answers) {
+
+        Answer[] answerReturned = new Answer[answers.length];
+
+        try {
+
+            DataBaseConnector dbConn = new DataBaseConnector();
+            AnswerManager AnswerManager = new AnswerManager(dbConn.connectToDb());
+
+            int i = 0;
+
+            for (Answer answer : answers) {
+
+                if (AnswerManager.updateAnswer(answer) != null) {
+
+                    answerReturned[i] = answer;
+
+                } else {
+
+                    answerReturned = null;
+                    break;
+
+                }
+
+                i++;
+
+            }
+
+            dbConn.disconnectFromDb();
+
+        } catch (Exception e) {
+            answerReturned = null;
+        }
+
+        return answerReturned;
 
     }
 

@@ -92,9 +92,18 @@ public class Question {
         this.lastModify = lastModify;
     }
 
-    public boolean equals(Question other) {
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 
-        return true;
+    public boolean isEmpty() {
+
+        boolean isEmptyId = this.id == 0;
+        boolean isEmptyAnswers = this.answers.length == 0;
+
+        return isEmptyAnswers && isEmptyId;
 
     }
+
 }
