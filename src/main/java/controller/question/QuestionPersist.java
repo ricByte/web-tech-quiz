@@ -20,7 +20,7 @@
 
         public QuestionPersist() {
             super();
-            // TODO Auto-generated constructor stub
+
         }
 
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

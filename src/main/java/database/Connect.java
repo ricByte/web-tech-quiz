@@ -23,7 +23,7 @@ public class Connect extends HttpServlet {
      */
     public Connect() {
         super();
-        // TODO Auto-generated constructor stub
+
     }
 
     /**

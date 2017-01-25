@@ -20,7 +20,7 @@ public class QuestionController extends HttpServlet {
 
     public QuestionController() {
         super();
-        // TODO Auto-generated constructor stub
+
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
