@@ -7,7 +7,9 @@ import services.question.QuestionService;
 
 import javax.servlet.ServletException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class QuestionManager {
     private static Connection conn;
@@ -199,5 +201,28 @@ public class QuestionManager {
         stmt.close();
 
         return null;
+    }
+
+    public List<Integer> getMaxMinQuestionId() {
+        List<Integer> maxMin = null;
+
+        String query = "SELECT MIN(q.id), MAX(q.id) " +
+                "FROM question as q";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                maxMin = new ArrayList<Integer>();
+                maxMin.add(rs.getInt(1));
+                maxMin.add(rs.getInt(2));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return maxMin;
     }
 }
