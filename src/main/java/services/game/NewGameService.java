@@ -3,20 +3,21 @@ package services.game;
 import beans.game.Game;
 import beans.game.QuestionPlayed;
 import beans.login.Session;
+import beans.question.Question;
+import beans.question.QuestionListResponse;
 import beans.question.QuestionResponse;
+import com.google.gson.JsonArray;
 import database.DataBaseConnector;
 import manager.game.GameManager;
 import model.reader.game.NewGameModel;
 import model.response.GameResponse;
 import services.login.userAuthenticationService;
+import services.question.QuestionService;
 
 
 public class NewGameService {
 
     public static GameResponse createNewGame(NewGameModel newGameModel) {
-
-        Game newGame = null;
-        QuestionPlayed questionGame = null;
 
         GameResponse gameResponse = GameResponse.returnErrorGame();
 
@@ -29,9 +30,17 @@ public class NewGameService {
             Session session = userAuthenticationService.verifySession(newGameModel.getSession());
 
             if (session != null) {
-                newGame = GameManager.insertNewGame(session);
-                questionGame = GameService.addQuestionToGame(newGame);
-                gameResponse = GameResponse.returnCorrectGame(newGame, questionGame);
+
+                Game newGame = GameManager.insertNewGame(session);
+                QuestionPlayed questionGame = GameService.addQuestionToGame(newGame);
+
+                JsonArray questionIdArray = new JsonArray();
+                questionIdArray.add(questionGame.getQuestionId());
+
+                QuestionListResponse questionList = QuestionService.getFilledQuestion(questionIdArray);
+                Question question = questionList.getQuestions()[0];
+                gameResponse = GameResponse.returnCorrectGame(newGame, questionGame, question);
+
             }
 
         } catch (Exception e) {

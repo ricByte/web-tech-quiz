@@ -2,13 +2,15 @@ package model.response;
 
 import beans.game.Game;
 import beans.game.QuestionPlayed;
+import beans.question.Question;
 
 /**
  *
  */
 public class GameResponse {
     private Game game;
-    private QuestionPlayed questionPlayed;
+    private int questioNumber;
+    private Question question;
 
     public Game getGame() {
         return game;
@@ -18,19 +20,28 @@ public class GameResponse {
         this.game = game;
     }
 
-    public QuestionPlayed getQuestionPlayed() {
-        return questionPlayed;
+    public int getQuestioNumber() {
+        return questioNumber;
     }
 
-    public void setQuestionPlayed(QuestionPlayed questionPlayed) {
-        this.questionPlayed = questionPlayed;
+    public void setQuestioNumber(int questioNumber) {
+        this.questioNumber = questioNumber;
     }
 
-    public static GameResponse returnCorrectGame(Game game, QuestionPlayed questionPlayed) {
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public static GameResponse returnCorrectGame(Game game, QuestionPlayed questionPlayed, Question question) {
         GameResponse gameResponse = new GameResponse();
 
-        gameResponse.setQuestionPlayed(questionPlayed);
+        gameResponse.setQuestioNumber(questionPlayed.getQuestionNumber());
         gameResponse.setGame(game);
+        gameResponse.setQuestion(question);
 
         return gameResponse;
     }
