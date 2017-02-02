@@ -100,4 +100,26 @@ public class userAuthenticationService {
     public static Boolean verifyEmail(String email) {
         return true;
     }
+
+    public static Session verifySession(String sessionSlug) {
+        Session session = null;
+
+        if (sessionSlug != null) {
+            DataBaseConnector dbConn = null;
+
+            try {
+
+                dbConn = new DataBaseConnector();
+                UserManager userManager = new UserManager(dbConn.connectToDb());
+
+                session = userManager.getSessionFromSession(sessionSlug);
+
+            } catch (ServletException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return session;
+    }
 }

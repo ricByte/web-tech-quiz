@@ -197,4 +197,31 @@ public class UserManager {
         }
 
     }
+
+    public static Session getSessionFromSession(String session) {
+        String sql = "SELECT * " +
+                "FROM sessions as s " +
+                "WHERE s.session = ?";
+
+        Session sessionSaved = null;
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, session);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                sessionSaved = userService.createSession(rs);
+            }
+
+            rs.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sessionSaved;
+    }
 }
