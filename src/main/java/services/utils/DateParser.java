@@ -33,4 +33,11 @@ public class DateParser {
         date.add((GregorianCalendar.MINUTE), minutes);
 
     }
+
+    public static boolean isValidDate(GregorianCalendar date){
+
+        GregorianCalendar currentDate = new GregorianCalendar();
+        return currentDate.before(date);
+
+    }
 }
