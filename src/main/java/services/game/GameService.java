@@ -2,12 +2,23 @@ package services.game;
 
 import beans.game.Game;
 import beans.game.QuestionPlayed;
+import beans.login.Session;
+import beans.question.Question;
+import beans.question.QuestionListResponse;
+import com.google.gson.JsonArray;
 import database.DataBaseConnector;
+import manager.game.GameManager;
 import manager.game.QuestionPlayedManager;
 import manager.question.QuestionManager;
+import model.reader.game.GameGetModel;
+import model.response.GameResponse;
+import services.login.userAuthenticationService;
+import services.question.QuestionService;
+import services.utils.DateParser;
 import services.utils.RandomAlphaNum;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import static manager.game.QuestionPlayedManager.createNewQuestionForGame;
@@ -64,6 +75,54 @@ public class GameService {
         }
 
         return questionForGame;
+
+    }
+
+    public static GameResponse getGame(GameGetModel gameGetModel) {
+
+        List<String> gameId = new ArrayList<String>();
+        String gameSearched = String.valueOf(gameGetModel.getGameId());
+        gameId.add(gameSearched);
+
+        GameResponse gameResponse = GameResponse.returnErrorGame();
+
+        Game game = getGame(gameId);
+
+        Session session = userAuthenticationService.verifySession(gameGetModel.getSession());
+
+        if ((session != null) && (DateParser.isValidDate(session.getValidUntil())) ) {
+
+            QuestionPlayed questionGame = GameService.addQuestionToGame(game);
+
+            JsonArray questionIdArray = new JsonArray();
+            questionIdArray.add(questionGame.getQuestionId());
+
+            QuestionListResponse questionList = QuestionService.getFilledQuestion(questionIdArray);
+            Question question = questionList.getQuestions()[0];
+
+            gameResponse = GameResponse.returnCorrectGame(game, questionGame, question);
+
+        }
+
+        return gameResponse;
+
+    }
+
+    public static Game getGame(List<String> gameList) {
+
+        Game game = null;
+        try {
+
+            DataBaseConnector dbConn = new DataBaseConnector();
+            GameManager GameManager = new GameManager(dbConn.connectToDb());
+
+            game = GameManager.getGameById(gameList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return game;
 
     }
 }

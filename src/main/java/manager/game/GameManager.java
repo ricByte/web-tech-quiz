@@ -48,7 +48,7 @@ public class GameManager {
 
     }
 
-    private static Game getGameById(List<String> ids) {
+    public static Game getGameById(List<String> ids) {
 
         String joined = StringUtils.join(ids, ",");
 

@@ -120,9 +120,15 @@ public class QuestionService {
         return response;
     }
 
-    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) throws ServletException {
+    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) {
 
-        QuestionListResponse questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+        QuestionListResponse questionWithOutAnswer = null;
+
+        try {
+            questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (questionWithOutAnswer.getQuestions().length > 0) {
 

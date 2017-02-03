@@ -13,6 +13,7 @@ import model.reader.game.NewGameModel;
 import model.response.GameResponse;
 import services.login.userAuthenticationService;
 import services.question.QuestionService;
+import services.utils.DateParser;
 
 
 public class NewGameService {
@@ -29,7 +30,7 @@ public class NewGameService {
 
             Session session = userAuthenticationService.verifySession(newGameModel.getSession());
 
-            if (session != null) {
+            if ((session != null) && (DateParser.isValidDate(session.getValidUntil()))) {
 
                 Game newGame = GameManager.insertNewGame(session);
                 QuestionPlayed questionGame = GameService.addQuestionToGame(newGame);
