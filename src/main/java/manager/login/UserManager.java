@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static services.login.userService.createSession;
+
 public class UserManager {
     private static Connection conn;
 
@@ -64,7 +66,7 @@ public class UserManager {
 
     }
 
-    public Session getSessionFromUser(User user) throws SQLException {
+    public Session getSessionFromUser(User user) {
 
         String sql = "select s.*  " +
                 "from sessions as s " +
@@ -74,20 +76,24 @@ public class UserManager {
                 "AND u.nickname = ? " +
                 "AND u.password = ?";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
 
-        stmt.setString(1, user.getNickname());
-        stmt.setString(2, user.getPassword());
+            stmt.setString(1, user.getNickname());
+            stmt.setString(2, user.getPassword());
 
-        ResultSet rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
+            if (rs.next()) {
 
-            return userService.createSession(rs);
+                return createSession(rs);
+
+            }
+
+            rs.close();
+        } catch (Exception e) {
 
         }
-
-        rs.close();
 
         return null;
     }
@@ -213,7 +219,7 @@ public class UserManager {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                sessionSaved = userService.createSession(rs);
+                sessionSaved = createSession(rs);
             }
 
             rs.close();
