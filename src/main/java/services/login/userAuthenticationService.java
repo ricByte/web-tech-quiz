@@ -114,6 +114,8 @@ public class userAuthenticationService {
 
                 session = userManager.getSessionFromSession(sessionSlug);
 
+                dbConn.disconnectFromDb();
+
             } catch (ServletException e) {
                 e.printStackTrace();
             }

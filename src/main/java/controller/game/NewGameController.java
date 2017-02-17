@@ -1,10 +1,9 @@
 package controller.game;
 
 
-import beans.game.Game;
 import com.google.gson.Gson;
 import model.reader.game.NewGameModel;
-import model.response.GameResponse;
+import model.response.game.GameResponse;
 import services.ResponseFactory;
 import services.game.NewGameService;
 

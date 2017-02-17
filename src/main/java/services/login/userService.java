@@ -2,9 +2,13 @@ package services.login;
 
 import beans.User;
 import beans.login.Session;
+import database.DataBaseConnector;
+import manager.login.UserManager;
 import services.utils.DateParser;
 import services.utils.RandomAlphaNum;
 
+import javax.servlet.ServletException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -88,5 +92,32 @@ public class userService {
         DateParser.addMin(gc, MinutesSessionValidity);
         return gc;
 
+    }
+
+    public static boolean updateLevel(User user) {
+        UserManager UserManager = getuserManager();
+        return UserManager.updateLevel(user);
+    }
+
+    public static User getUserFromSession(String session) {
+
+        UserManager UserManager = getuserManager();
+
+        User user = UserManager.getUserFromSession(session);
+
+        return user;
+    }
+
+    private static UserManager getuserManager() {
+        DataBaseConnector dbConn = null;
+
+        try {
+            dbConn = new DataBaseConnector();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
+
+        Connection connection = dbConn.connectToDb();
+        return new UserManager(connection);
     }
 }

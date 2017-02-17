@@ -1,4 +1,4 @@
-package model.response;
+package model.response.game;
 
 import beans.game.Game;
 import beans.game.QuestionPlayed;

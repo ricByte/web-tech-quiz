@@ -1,15 +1,13 @@
 package controller.game;
 
 
-import beans.game.Game;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import model.reader.game.GameGetModel;
-import model.response.GameResponse;
+import model.response.game.GameResponse;
 import services.ParameterGetter;
 import services.ResponseFactory;
 import services.game.GameService;
-import services.game.NewGameService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

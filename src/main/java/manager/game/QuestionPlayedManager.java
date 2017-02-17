@@ -5,6 +5,8 @@ import beans.game.QuestionPlayed;
 import manager.BaseManager;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class QuestionPlayedManager extends BaseManager{
@@ -119,4 +121,112 @@ public class QuestionPlayedManager extends BaseManager{
     }
 
 
+    public QuestionPlayed getQuestionPlayedByNumber(int questionNumber, int gameId) {
+
+        String query = "SELECT * " +
+                "FROM question_played as qp " +
+                "WHERE qp.game_ID = ? " +
+                "AND qp.question_number = ?";
+
+        QuestionPlayed questionPlayed = null;
+
+        try {
+
+            PreparedStatement stmt = getConn().prepareStatement(query);
+            stmt.setInt(1, gameId);
+            stmt.setInt(2, questionNumber);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+
+                int questionId = rs.getInt("question_ID");
+                int playerAnswer = rs.getInt("player_answer");
+
+                questionPlayed = new QuestionPlayed();
+
+                questionPlayed.setQuestionId(questionId);
+                questionPlayed.setGameId(gameId);
+                questionPlayed.setQuestionNumber(questionNumber);
+                questionPlayed.setPlayerAnswer(playerAnswer);
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return questionPlayed;
+    }
+
+    public List<QuestionPlayed> getQuestionPlayedListOfRightAnswerByGameId(int questionNumber, int gameId) {
+
+        String query = "SELECT COUNT(*) " +
+                "FROM question_played as qp " +
+                "JOIN question as q " +
+                "ON q.id = qp.question_ID " +
+                "WHERE qp.game_ID = ? " +
+                "AND q.solution = qp.player_answer " +
+                "AND qp.question_number < ?";
+
+        List<QuestionPlayed> questionPlayedList = new ArrayList<QuestionPlayed>();
+
+        try {
+
+            PreparedStatement stmt = getConn().prepareStatement(query);
+            stmt.setInt(1, gameId);
+            stmt.setInt(2, questionNumber);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+
+                int questionId = rs.getInt("question_ID");
+                int playerAnswer = rs.getInt("player_answer");
+
+                QuestionPlayed questionPlayed = new QuestionPlayed();
+
+                questionPlayed.setQuestionId(questionId);
+                questionPlayed.setGameId(gameId);
+                questionPlayed.setQuestionNumber(questionNumber);
+                questionPlayed.setPlayerAnswer(playerAnswer);
+
+                questionPlayedList.add(questionPlayed);
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return questionPlayedList;
+    }
+
+    public boolean updateQuestionPlayed(QuestionPlayed questionPlayed) {
+
+        boolean questionUpdated = false;
+
+        String query = "UPDATE question_played " +
+                "SET player_answer = ? " +
+                "WHERE question_number = ? " +
+                "AND game_ID = ? ";
+
+        try {
+            PreparedStatement stmt = getConn().prepareStatement(query);
+            stmt.setInt(1, questionPlayed.getPlayerAnswer());
+            stmt.setInt(2, questionPlayed.getQuestionNumber());
+            stmt.setInt(3, questionPlayed.getGameId());
+
+            int rowUpdated = stmt.executeUpdate();
+
+            if (rowUpdated > 0) {
+                questionUpdated = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return questionUpdated;
+    }
 }
