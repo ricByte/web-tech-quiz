@@ -6,9 +6,18 @@ import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
 public class Session {
+    private int id;
     private User userId = null;
     private String session = null;
     private GregorianCalendar validUntil = null;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public User getUserId() {
         return userId;

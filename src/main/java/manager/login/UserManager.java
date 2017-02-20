@@ -9,11 +9,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static services.login.userService.createSession;
+
 public class UserManager {
     private static Connection conn;
 
     public UserManager(Connection conn) {
         this.conn = conn;
+    }
+
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public  void createUserTable() throws SQLException {
@@ -64,7 +76,7 @@ public class UserManager {
 
     }
 
-    public Session getSessionFromUser(User user) throws SQLException {
+    public Session getSessionFromUser(User user) {
 
         String sql = "select s.*  " +
                 "from sessions as s " +
@@ -74,20 +86,24 @@ public class UserManager {
                 "AND u.nickname = ? " +
                 "AND u.password = ?";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
 
-        stmt.setString(1, user.getNickname());
-        stmt.setString(2, user.getPassword());
+            stmt.setString(1, user.getNickname());
+            stmt.setString(2, user.getPassword());
 
-        ResultSet rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
+            if (rs.next()) {
 
-            return userService.createSession(rs);
+                return createSession(rs);
+
+            }
+
+            rs.close();
+        } catch (Exception e) {
 
         }
-
-        rs.close();
 
         return null;
     }
@@ -196,5 +212,88 @@ public class UserManager {
             return null;
         }
 
+    }
+
+    public static Session getSessionFromSession(String session) {
+        String sql = "SELECT * " +
+                "FROM sessions as s " +
+                "WHERE s.session = ?";
+
+        Session sessionSaved = null;
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, session);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                sessionSaved = createSession(rs);
+            }
+
+            rs.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sessionSaved;
+    }
+
+    public User getUserFromSession(String session) {
+        String sql = "SELECT u.* " +
+                "FROM user as u " +
+                "JOIN sessions as s " +
+                "ON u.id = s.user_ID " +
+                "WHERE s.session = ?";
+
+        User user = null;
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, session);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                user = userService.createUser(rs);
+            }
+
+            rs.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    public boolean updateLevel(User user) {
+
+        String sql = "UPDATE user  " +
+                "SET cleverness = ?  " +
+                "WHERE nickname = ?  ";
+
+        boolean returned = false;
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, user.getCleverness());
+            stmt.setString(2, user.getNickname());
+
+            int up = stmt.executeUpdate();
+
+            if (up > 0) {
+                returned = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return returned;
     }
 }

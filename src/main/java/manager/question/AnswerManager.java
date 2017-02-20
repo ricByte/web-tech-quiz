@@ -29,6 +29,16 @@ public class AnswerManager {
 //
 //    }
 
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static int registerAnswer(Answer answer, int questionId) throws SQLException {
 
         String sql = "INSERT " +

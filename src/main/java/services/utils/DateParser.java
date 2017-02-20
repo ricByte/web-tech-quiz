@@ -1,5 +1,6 @@
 package services.utils;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,5 +33,18 @@ public class DateParser {
 
         date.add((GregorianCalendar.MINUTE), minutes);
 
+    }
+
+    public static boolean isValidDate(GregorianCalendar date){
+
+        GregorianCalendar currentDate = new GregorianCalendar();
+        return currentDate.before(date);
+
+    }
+
+    public static Timestamp createTimeStamp() {
+        Date now = new Date();
+
+        return new Timestamp(now.getTime());
     }
 }

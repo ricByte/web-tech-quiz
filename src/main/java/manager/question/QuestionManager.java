@@ -4,10 +4,13 @@ import beans.question.Question;
 import com.google.gson.JsonArray;
 import services.question.AnswerService;
 import services.question.QuestionService;
+import services.utils.DateParser;
 
 import javax.servlet.ServletException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class QuestionManager {
     private static Connection conn;
@@ -16,13 +19,26 @@ public class QuestionManager {
         this.conn = conn;
     }
 
-    public static Question insertQuestion(Question question) throws SQLException, ServletException {
-        String sql = "insert into question (text, difficulty) values (?, ?)";
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    
+    public static Question insertQuestion(Question question, int idQuestion) throws SQLException, ServletException {
+        String sql = "insert into question (text, difficulty, user_ID, last_modify) " +
+                "values (?, ?, ?, ?)";
 
         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         stmt.setString(1, question.getText());
         stmt.setString(2, question.getDifficulty());
+        stmt.setInt(3, idQuestion);
+        stmt.setTimestamp(4, DateParser.createTimeStamp());
 
         stmt.executeUpdate();
 
@@ -109,9 +125,9 @@ public class QuestionManager {
                 "    FROM answer as a " +
                 "    WHERE a.num = ? " +
                 "    AND a.question_ID = q.id " +
-                "), text = ?, difficulty = ? " +
+                "), text = ?, difficulty = ?, last_modify = ? " +
                 "WHERE q.id = ?";
-        //TODO add last_modify
+
         //TODO add parseDate method to java.sql
         Question questionUpdated = null;
 
@@ -125,6 +141,8 @@ public class QuestionManager {
                 stmtGet.setString(2, question.getText());
                 stmtGet.setString(3, question.getDifficulty());
                 stmtGet.setInt(4, question.getId());
+                stmtGet.setTimestamp(5, DateParser.createTimeStamp());
+
                 stmtGet.executeUpdate();
 
                 stmtGet.close();
@@ -199,5 +217,28 @@ public class QuestionManager {
         stmt.close();
 
         return null;
+    }
+
+    public List<Integer> getMaxMinQuestionId() {
+        List<Integer> maxMin = null;
+
+        String query = "SELECT MIN(q.id), MAX(q.id) " +
+                "FROM question as q";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                maxMin = new ArrayList<Integer>();
+                maxMin.add(rs.getInt(1));
+                maxMin.add(rs.getInt(2));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return maxMin;
     }
 }

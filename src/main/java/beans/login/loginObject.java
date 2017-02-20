@@ -1,11 +1,10 @@
 package beans.login;
 
 import beans.User;
-import beans.login.Session;
 
 public class loginObject {
 
-    private beans.User User = null;
+    private User User = null;
     private Session Session = null;
 
 
@@ -38,6 +37,7 @@ public class loginObject {
 
     public static loginObject createSuccessfullLogin(User user,Session session) {
         session.setUserId(null);
+        user.setPassword(null);
         return new loginObject(user,session);
     }
 }

@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import static services.GsonFactory.constructJson;
+
 public class ResponseFactory {
     public static HttpServletResponse createResponse(HttpServletResponse response) {
 
@@ -18,19 +20,35 @@ public class ResponseFactory {
 
     }
 
-    public static void sendResponse(HttpServletResponse response, Object value, String name) throws IOException {
+    public static void sendResponse(HttpServletResponse response, Object value, String name) {
 
-        PrintWriter out = response.getWriter();
-        out.write(GsonFactory.constructJson("OK", 200, value, name));
-        out.flush();
+        try {
+            PrintWriter out = response.getWriter();
+            out.write(constructJson("OK", 200, value, name));
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     public static void sendResponse(HttpServletResponse response, Object value, String name, int status) throws IOException {
 
         PrintWriter out = response.getWriter();
-        out.write(GsonFactory.constructJson("OK", status, value, name));
+        out.write(constructJson("OK", status, value, name));
         out.flush();
+
+    }
+
+    public static void sendResponse(HttpServletResponse response, Object value) {
+
+        try {
+            PrintWriter out = response.getWriter();
+            out.write(constructJson(value));
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
