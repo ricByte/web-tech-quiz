@@ -27,6 +27,7 @@ public class AnswerService {
         }
 
         dbConn.disconnectFromDb();
+        AnswerManager.disconnect();
 
         return returnedAnswer;
 
@@ -48,7 +49,7 @@ public class AnswerService {
             }
 
             dbConn.disconnectFromDb();
-
+            AnswerManager.disconnect();
 
         }catch(Exception e) {
 
@@ -87,6 +88,7 @@ public class AnswerService {
             }
 
             dbConn.disconnectFromDb();
+            AnswerManager.disconnect();
 
         } catch (Exception e) {
             answerReturned = null;

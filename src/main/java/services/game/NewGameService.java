@@ -43,6 +43,9 @@ public class NewGameService {
 
             }
 
+            dbConn.disconnectFromDb();
+            GameManager.disconnect();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

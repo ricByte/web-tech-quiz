@@ -18,6 +18,16 @@ public class UserManager {
         this.conn = conn;
     }
 
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public  void createUserTable() throws SQLException {
         String query = "CREATE TABLE `user` (\n" +
                 "  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,\n" +

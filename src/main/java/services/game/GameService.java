@@ -79,6 +79,8 @@ public class GameService {
             }
 
             dbConn.disconnectFromDb();
+            QuestionManager.disconnect();
+            QuestionPlayedManager.disconnect();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,6 +121,7 @@ public class GameService {
             game = GameManager.getGameById(gameList);
 
             dbConn.disconnectFromDb();
+            GameManager.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,6 +197,7 @@ public class GameService {
 
             connection.close();
             dbConn.disconnectFromDb();
+            QuestionPlayedManager.disconnect();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,6 +265,7 @@ public class GameService {
             questionPlayed = QuestionPlayedManager.getQuestionPlayedByNumber(questionNumber, gameId);
 
             dbConn.disconnectFromDb();
+            QuestionPlayedManager.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }

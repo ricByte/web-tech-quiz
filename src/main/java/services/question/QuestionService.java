@@ -36,6 +36,7 @@ public class QuestionService {
             response.setStatus(true);
 
             dbConn.disconnectFromDb();
+            QuestionManager.disconnect();
         }
 
 
@@ -68,6 +69,7 @@ public class QuestionService {
                 }
 
                 dbConn.disconnectFromDb();
+                QuestionManager.disconnect();
 
             }catch(Exception e) {
 
@@ -116,7 +118,7 @@ public class QuestionService {
             }
 
             dbConn.disconnectFromDb();
-
+            QuestionManager.disconnect();
         }
 
         return response;

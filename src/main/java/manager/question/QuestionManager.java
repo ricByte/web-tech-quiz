@@ -19,6 +19,16 @@ public class QuestionManager {
         this.conn = conn;
     }
 
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    
     public static Question insertQuestion(Question question, int idQuestion) throws SQLException, ServletException {
         String sql = "insert into question (text, difficulty, user_ID, last_modify) " +
                 "values (?, ?, ?, ?)";

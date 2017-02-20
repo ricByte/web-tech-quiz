@@ -17,6 +17,8 @@ public class QuestionPlayedService {
 
         boolean updateQuestionPlayed = QuestionPlayedManager.updateQuestionPlayed(questionPlayed);
 
+        QuestionPlayedManager.disconnect();
+
         return updateQuestionPlayed;
 
     }

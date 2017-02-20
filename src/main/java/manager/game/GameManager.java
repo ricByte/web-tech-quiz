@@ -17,6 +17,16 @@ public class GameManager {
         this.conn = connection;
     }
 
+    public void disconnect() {
+
+        try {
+            this.conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static Game insertNewGame(Session session) {
 
         String sql = "insert into game (session_NUMBER, points) " +
