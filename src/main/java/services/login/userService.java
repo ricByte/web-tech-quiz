@@ -2,12 +2,16 @@ package services.login;
 
 import beans.User;
 import beans.login.Session;
+import beans.login.loginObject;
+import database.DataBaseConnector;
+import manager.login.UserManager;
 import services.utils.DateParser;
 import services.utils.RandomAlphaNum;
 
+import javax.servlet.ServletException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class userService {
@@ -51,6 +55,7 @@ public class userService {
             String nickname = rs.getString("nickname");
             int cleverness = rs.getInt("cleverness");
             int typeof = rs.getInt("typeOfPlayer");
+            String password = rs.getString("password");
 
             User user = new User();
             user.setId(rs.getInt("id"));
@@ -58,6 +63,7 @@ public class userService {
             user.setEmail(email);
             user.setCleverness(cleverness);
             user.setTypeOfPlayer(typeof);
+            user.setPassword(password);
 
             return user;
 
@@ -88,5 +94,48 @@ public class userService {
         DateParser.addMin(gc, MinutesSessionValidity);
         return gc;
 
+    }
+
+    public static boolean updateLevel(User user) {
+        UserManager UserManager = getuserManager();
+        return UserManager.updateLevel(user);
+    }
+
+    public static User getUserFromSession(String session) {
+
+        UserManager UserManager = getuserManager();
+
+        User user = UserManager.getUserFromSession(session);
+
+        return user;
+    }
+
+    private static UserManager getuserManager() {
+        DataBaseConnector dbConn = null;
+
+        try {
+            dbConn = new DataBaseConnector();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
+
+        Connection connection = dbConn.connectToDb();
+        return new UserManager(connection);
+    }
+
+    public static loginObject autoLogin(String session){
+
+        User user = getUserFromSession(session);
+
+        loginObject loginObject = beans.login.loginObject.createFailedLoginObject();
+
+        if (user != null) {
+            UserManager UserManager = getuserManager();
+            Session Session = UserManager.getSessionFromUser(user);
+            if (Session != null)
+                loginObject = loginObject.createSuccessfullLogin(user, Session);
+        }
+
+        return loginObject;
     }
 }

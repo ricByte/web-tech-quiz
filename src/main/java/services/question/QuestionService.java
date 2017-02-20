@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import database.DataBaseConnector;
 import manager.question.QuestionManager;
 import services.ParameterGetter;
+import services.login.userService;
 
 import javax.servlet.ServletException;
 import java.util.Date;
@@ -21,18 +22,21 @@ public class QuestionService {
     public static QuestionResponse createQuestion(String session, JsonObject question) throws SQLException, ServletException {
 
 
-        Question questionObj = QuestionService.parseJsonToQuestion(question);
+        Question questionObj = QuestionService.parseJsonForQuestion(question);
         QuestionResponse response = new QuestionResponse();
 
         if (questionObj.getAnswers() != null) {
             DataBaseConnector dbConn = new DataBaseConnector();
             QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
 
-            questionObj = QuestionManager.insertQuestion(questionObj);
+            User user = userService.getUserFromSession(session);
+
+            questionObj = QuestionManager.insertQuestion(questionObj, user.getId());
             response.setQuestion(questionObj);
             response.setStatus(true);
 
             dbConn.disconnectFromDb();
+            QuestionManager.disconnect();
         }
 
 
@@ -44,23 +48,35 @@ public class QuestionService {
 
         Question questionObj = QuestionService.parseJsonToQuestion(question);
         QuestionResponse response = new QuestionResponse();
+        response.setStatus(false);
+
+        //TODO add check user permission
 
         if (questionObj.getAnswers() != null) {
             try {
 
                 DataBaseConnector dbConn = new DataBaseConnector();
                 QuestionManager QuestionManager = new QuestionManager(dbConn.connectToDb());
+                Question questionAlreadySave = QuestionManager.getQuestionFullObject(questionObj);
 
-                /*questionObj = QuestionManager.insertQuestion(questionObj);
-                response.setQuestion(questionObj);
-                response.setStatus(true);*/
+                if (!questionAlreadySave.isEmpty()) {
+
+                    questionObj = QuestionManager.updateQuestion(questionObj);
+
+                    if (!questionObj.isEmpty())
+                        response.setStatus(true);
+
+                }
 
                 dbConn.disconnectFromDb();
+                QuestionManager.disconnect();
 
             }catch(Exception e) {
 
             }
         }
+
+        response.setQuestion(questionObj);
 
         return response;
 
@@ -102,15 +118,21 @@ public class QuestionService {
             }
 
             dbConn.disconnectFromDb();
-
+            QuestionManager.disconnect();
         }
 
         return response;
     }
 
-    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) throws ServletException {
+    public static QuestionListResponse getFilledQuestion(JsonArray questionsId) {
 
-        QuestionListResponse questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+        QuestionListResponse questionWithOutAnswer = null;
+
+        try {
+            questionWithOutAnswer = QuestionService.getQuestions(questionsId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (questionWithOutAnswer.getQuestions().length > 0) {
 
@@ -141,6 +163,36 @@ public class QuestionService {
             String text = JsonQuestion.get("text").getAsString();
             String difficulty = JsonQuestion.get("difficulty").getAsString();
             int solution = JsonQuestion.get("solution").getAsInt();
+            int QuestionId = JsonQuestion.get("id").getAsInt();
+
+            JsonArray answers = JsonQuestion.get("answers").getAsJsonArray();
+
+            Answer[] filledAnswers = QuestionService.fillAnswer(answers, QuestionId);
+
+            ReturnedQuestion.setId(QuestionId);
+            ReturnedQuestion.setAnswers(filledAnswers);
+            ReturnedQuestion.setText(text);
+            ReturnedQuestion.setDifficulty(difficulty);
+            ReturnedQuestion.setSolution(solution);
+
+
+        } catch(Exception ex) {
+
+        }
+
+        return ReturnedQuestion;
+
+    }
+
+    public static Question parseJsonForQuestion(JsonObject JsonQuestion) {
+
+        Question ReturnedQuestion = new Question();
+
+        try {
+
+            String text = JsonQuestion.get("text").getAsString();
+            String difficulty = JsonQuestion.get("difficulty").getAsString();
+            int solution = JsonQuestion.get("solution").getAsInt();
 
             JsonArray answers = JsonQuestion.get("answers").getAsJsonArray();
 
@@ -156,17 +208,11 @@ public class QuestionService {
 
         }
 
-        try {
-            ReturnedQuestion.setId(JsonQuestion.get("id").getAsInt());
-        } catch(Exception e) {
-
-        }
-
         return ReturnedQuestion;
 
     }
 
-    private static Answer[]  fillAnswer(JsonArray anwers) {
+    private static Answer[]  fillAnswer(JsonArray anwers, int QuestionId) {
 
         Answer[] answersFilled = new Answer[0];
 
@@ -202,6 +248,8 @@ public class QuestionService {
             Answer tempAnswer = new Answer();
 
             tempAnswer.setNum(number);
+            tempAnswer.setFK_Question((new Question()));
+            tempAnswer.getFK_Question().setId(QuestionId);
 
             try {
 
@@ -211,25 +259,83 @@ public class QuestionService {
 
             }
 
-            switch (type) {
-
-                case "image":
-                    tempAnswer.setImage(text);
-                    break;
-
-                case "link":
-                    tempAnswer.setLink(text);
-                    break;
-
-                default:
-                    tempAnswer.setText(text);
-            }
+            getType(text, type, tempAnswer);
 
             answersFilled[i] = tempAnswer;
 
         }
 
         return answersFilled;
+    }
+
+    private static Answer[] fillAnswer(JsonArray anwers) {
+
+        Answer[] answersFilled = new Answer[0];
+
+        if (anwers.size() > 0) {
+            answersFilled = new Answer[anwers.size()];
+        }
+
+        for (int i = 0; i < anwers.size(); i++) {
+
+            JsonObject answerJson = anwers.get(i).getAsJsonObject();
+            String text = null;
+            String type = "text";
+            int number = 0;
+
+            try {
+                text = answerJson.get("text").getAsString();
+            }catch (Exception e) {
+
+            }
+
+            try {
+                type = answerJson.get("type").getAsString();
+            }catch(Exception e) {
+
+            }
+
+            try {
+                number = answerJson.get("num").getAsInt();
+            }catch(Exception e) {
+
+            }
+
+            Answer tempAnswer = new Answer();
+
+            tempAnswer.setNum(number);
+
+            try {
+
+                tempAnswer.setId(answerJson.get("id").getAsInt());
+
+            }catch(Exception e) {
+
+            }
+
+            getType(text, type, tempAnswer);
+
+            answersFilled[i] = tempAnswer;
+
+        }
+
+        return answersFilled;
+    }
+
+    private static void getType(String text, String type, Answer tempAnswer) {
+        switch (type) {
+
+            case "image":
+                tempAnswer.setImage(text);
+                break;
+
+            case "link":
+                tempAnswer.setLink(text);
+                break;
+
+            default:
+                tempAnswer.setText(text);
+        }
     }
 
     /**
